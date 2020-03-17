@@ -234,7 +234,7 @@ class IrActionsReport(models.Model):
         libreoffice_timeout = self._get_aeroo_config_parameter('libreoffice_timeout')
         return float(libreoffice_timeout)
 
-    def render_aeroo(self, doc_ids, data=None, force_output_format=None):
+    def render_aeroo(self, doc_ids, data=None, force_output_format=None, title=None):
         """Render an aeroo report.
 
         If doc_ids contains more than one record id, the report will
@@ -245,6 +245,7 @@ class IrActionsReport(models.Model):
         :param dict data: the data to send to the report as context.
         :param str force_output_format: whether to force a given output report format.
             If not given the standard output format defined on the report is used.
+        :param str title: document title
         """
         output_format = force_output_format or self.aeroo_out_format_id.code
 
@@ -268,7 +269,7 @@ class IrActionsReport(models.Model):
         # Render the report
         current_report_data = dict(
             data, o=record.with_context(**report_context))
-        output = self._render_aeroo(template, current_report_data, output_format)
+        output = self._render_aeroo(template, current_report_data, output_format, title)
 
         # Generate the attachment
         if self.attachment_use:
@@ -276,18 +277,21 @@ class IrActionsReport(models.Model):
 
         return output, output_format
 
-    def _render_aeroo(self, template, data, output_format):
+    def _render_aeroo(self, template, data, output_format, title=None):
         """Generate the aeroo report binary from the template.
 
         :param template: the Libreoffice template to use
         :param data: the data used for rendering the report
         :param output_format: the output format
+        :param str title: document title
         :return: the report's binary data
         """
         # The first given record is
         template_io = BytesIO()
         template_io.write(template)
         serializer = OOSerializer(template_io)
+        if title:
+            serializer.add_title(title)
 
         report_context = GenshiContext(**data)
         report_context.update(self._get_aeroo_extra_functions())
@@ -538,13 +542,13 @@ class AerooReportsGeneratedFromListViews(models.Model):
 
     _inherit = 'ir.actions.report'
 
-    def render_aeroo(self, doc_ids, data=None, force_output_format=None):
+    def render_aeroo(self, doc_ids, data=None, force_output_format=None, title=None):
         if self.multi:
-            return self._render_aeroo_from_list_of_records(doc_ids, data, force_output_format)
+            return self._render_aeroo_from_list_of_records(doc_ids, data, force_output_format, title)
         else:
-            return super().render_aeroo(doc_ids, data, force_output_format)
+            return super().render_aeroo(doc_ids, data, force_output_format, title)
 
-    def _render_aeroo_from_list_of_records(self, doc_ids, data=None, force_output_format=None):
+    def _render_aeroo_from_list_of_records(self, doc_ids, data=None, force_output_format=None, title=None):
         """Render an aeroo report for a list of record ids.
 
         :param list doc_ids: the ids of the records.
@@ -570,7 +574,7 @@ class AerooReportsGeneratedFromListViews(models.Model):
 
         # Render the report
         output = self.with_context(**report_context)._render_aeroo(
-            template, report_data, output_format)
+            template, report_data, output_format, title)
 
         return output, output_format
 
