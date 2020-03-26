@@ -224,6 +224,8 @@ class IrActionsReport(models.Model):
             'tz': self._get_aeroo_timezone(record),
             'country': self._get_aeroo_country(record),
             'currency': self._get_aeroo_currency(record),
+            'company': self._get_aeroo_company(record),
+            'user': self.env.user,
         }
 
     def _get_aeroo_libreoffice_timeout(self):
@@ -269,6 +271,8 @@ class IrActionsReport(models.Model):
         # Render the report
         current_report_data = dict(
             data, o=record.with_context(**report_context))
+        # Add report_context content for direct access instead of using o.env.context
+        current_report_data.update(report_context)
         output = self._render_aeroo(template, current_report_data, output_format, title)
 
         # Generate the attachment
