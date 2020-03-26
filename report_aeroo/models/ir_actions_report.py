@@ -326,8 +326,12 @@ class IrActionsReport(models.Model):
             data,
             o=record.with_context(**report_context),
             company=self._get_aeroo_company(record),
+            user=self.env.user,
             **report_context
         )
+        # Add report_context content for direct access instead
+        # of using o.env.context
+        current_report_data.update(report_context)
         output = self._render_aeroo_content(
             template, current_report_data, output_format
         )
@@ -634,6 +638,7 @@ class AerooReportsGeneratedFromListViews(models.Model):
             data,
             objects=records,
             company=self._get_aeroo_company(records[0]),
+            user=self.env.user,
             **report_context
         )
 
