@@ -46,8 +46,11 @@ class AerooReportController(http.Controller):
             raise ValidationError(
                 _('The report name is expected in order to generate an aeroo report.'))
 
-        title = action_data['display_name']
-        content, out_format = report.render_aeroo(ids, {}, title=title)
+        title = action_data.get('display_name', False)
+        if not title:
+            title = report.display_name
+        data = {'data': action_data.get('data', False)}
+        content, out_format = report.render_aeroo(ids, data, title=title)
 
         if len(ids) == 1:
             record = request.env[report.model].browse(ids[0])
