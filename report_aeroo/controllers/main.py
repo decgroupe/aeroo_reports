@@ -52,11 +52,17 @@ class AerooReportController(http.Controller):
         data = {'data': action_data.get('data', False)}
         content, out_format = report.render_aeroo(ids, data, title=title)
 
+        default_file_name = '%s.%s' % (report.name, out_format)
+
         if len(ids) == 1:
             record = request.env[report.model].browse(ids[0])
             file_name = report.get_aeroo_filename(record, out_format)
         else:
             file_name = '%s.%s' % (report.name, out_format)
+
+        if file_name == default_file_name:
+            if 'file_name' in action_data:
+                file_name = '%s.%s' % (action_data.get('file_name'), out_format)
 
         report_mimetype = MIMETYPES_MAPPING.get(out_format, DEFAULT_MIMETYPE)
 
