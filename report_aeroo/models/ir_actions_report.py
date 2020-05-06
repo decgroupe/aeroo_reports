@@ -483,7 +483,7 @@ class IrActionsReport(models.Model):
 
         cmd = [pdftk_location]
         cmd += input_files
-        cmd += ['cat', 'output', output_file.name]
+        cmd += ['cat', 'output', output_file.name, 'verbose']
 
         timeout = self._get_aeroo_libreoffice_timeout()
 
