@@ -49,7 +49,10 @@ class AerooReportController(http.Controller):
         title = action_data.get('display_name', False)
         if not title:
             title = report.display_name
-        data = {'data': action_data.get('data', False)}
+        data = {
+            'action_context': action_data.get('context', {}),
+            'data': action_data.get('data', {}),
+        }
         content, out_format = report.render_aeroo(ids, data, title=title)
 
         default_file_name = '%s.%s' % (report.name, out_format)
