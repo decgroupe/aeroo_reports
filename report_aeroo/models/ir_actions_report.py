@@ -252,7 +252,10 @@ class IrActionsReport(models.Model):
         output_format = force_output_format or self.aeroo_out_format_id.code
 
         if data is None:
-            data = {}
+            data = {
+                'action_context': {},
+                'data': {},
+            }
 
         if len(doc_ids) > 1:
             return self._render_aeroo_multi(doc_ids, data, output_format)
