@@ -50,8 +50,8 @@ class AerooReportController(http.Controller):
         if not title:
             title = report.display_name
         data = {
-            'action_context': action_data.get('context', {}),
-            'data': action_data.get('data', {}),
+            'action_context': action_data.get('context', {}) or {},
+            'data': action_data.get('data', {}) or {},
         }
         content, out_format = report.render_aeroo(ids, data, title=title)
 

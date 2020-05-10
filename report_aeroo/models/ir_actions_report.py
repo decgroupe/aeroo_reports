@@ -9,6 +9,7 @@ import logging
 import os
 import sys
 import traceback
+from types import SimpleNamespace
 from aeroolib.plugins.opendocument import Template, OOSerializer
 from datetime import datetime
 from functools import wraps
@@ -226,6 +227,9 @@ class IrActionsReport(models.Model):
             'currency': self._get_aeroo_currency(record),
             'company': self._get_aeroo_company(record),
             'user': self.env.user,
+            # Create temporary storage where attributes can be set using
+            # @aeroo_util('set')
+            't': SimpleNamespace()
         }
 
     def _get_aeroo_libreoffice_timeout(self):
