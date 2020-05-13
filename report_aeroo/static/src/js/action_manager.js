@@ -54,7 +54,7 @@ ActionManager.include({
 
         var self = this;
         return $.Deferred((deferred) => {
-            session.get_file({
+            var blocked = !session.get_file({
                 url: "/web/report_aeroo",
                 data: {action: JSON.stringify(action)},
                 success: deferred.resolve.bind(deferred),
@@ -64,6 +64,12 @@ ActionManager.include({
                 },
                 complete: framework.unblockUI,
             });
+            if (blocked) {
+                var message = _t('A popup window with your report was blocked. You ' +
+                                 'may need to change your browser settings to allow ' +
+                                 'popup windows for this page.');
+                this.do_warn(_t('Warning'), message, true);
+            }
         });
     },
 });
