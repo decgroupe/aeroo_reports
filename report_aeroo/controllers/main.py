@@ -46,7 +46,24 @@ class AerooReportController(http.Controller):
             raise ValidationError(
                 _('The report name is expected in order to generate an aeroo report.'))
 
-        title = action_data.get('display_name', False)
+        file_name = default_file_name = report.name
+        if len(ids) == 1:
+            obj = request.env[report.model].browse(ids[0])
+            file_name = report.get_aeroo_filename(obj)
+
+        # Override report filename only if not already set (from attachment)
+        if file_name == default_file_name:
+            if 'file_name' in action_data:
+                file_name = action_data.get('file_name')
+            else:
+                if report.print_report_name:
+                    obj = request.env[report.model].browse(ids)
+                    file_name = safe_eval(report.print_report_name, {
+                        'object': obj, 
+                        'time': time
+                    })
+
+        title = file_name
         if not title:
             title = report.display_name
         data = {
@@ -55,18 +72,7 @@ class AerooReportController(http.Controller):
         }
         content, out_format = report.render_aeroo(ids, data, title=title)
 
-        default_file_name = '%s.%s' % (report.name, out_format)
-
-        if len(ids) == 1:
-            record = request.env[report.model].browse(ids[0])
-            file_name = report.get_aeroo_filename(record, out_format)
-        else:
-            file_name = '%s.%s' % (report.name, out_format)
-
-        if file_name == default_file_name:
-            if 'file_name' in action_data:
-                file_name = '%s.%s' % (action_data.get('file_name'), out_format)
-
+        file_name = "%s.%s" % (file_name, out_format)
         report_mimetype = MIMETYPES_MAPPING.get(out_format, DEFAULT_MIMETYPE)
 
         response = request.make_response(
