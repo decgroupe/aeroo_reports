@@ -8,6 +8,7 @@ import babel.dates
 import base64
 import logging
 import time
+import qrcode
 from babel.core import localedata
 from datetime import datetime, date
 from html2text import html2text
@@ -228,6 +229,11 @@ def barcode(
             im = get_code(code, xw, height)
         elif code_type.lower() == 'code39':
             im = create_c39(height, xw, code)
+        elif code_type.lower()=='qrcode':
+            qr = qrcode.QRCode(box_size=height)
+            qr.add_data(code)
+            qr.make()
+            im = qr.make_image()
     else:
         return BytesIO(), 'image/png'
 
