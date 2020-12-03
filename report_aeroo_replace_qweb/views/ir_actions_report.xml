@@ -39,6 +39,9 @@
                     domain="[('model', '=', model), ('report_type', '=', 'aeroo')]"
                     attrs="{'invisible': [('report_type', '!=', 'qweb-pdf')]}"
                     />
+                <field name="aeroo_report_custom_data"
+                    attrs="{'invisible': [('report_type', '!=', 'qweb-pdf')]}"
+                    />
             </field>
         </field>
     </record>

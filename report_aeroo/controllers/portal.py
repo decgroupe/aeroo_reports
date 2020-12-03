@@ -9,7 +9,7 @@ from odoo.http import content_disposition, request
 
 class PortalAccountWithAerooInvoiceReport(CustomerPortal):
 
-    def _show_aeroo_report(self, record, template, download=False):
+    def _show_aeroo_report(self, record, template, data=None, download=False):
         """Show the given aeroo in the portal.
 
         This method is an adapted version of CustomerPortal._show_report found here:
@@ -19,7 +19,7 @@ class PortalAccountWithAerooInvoiceReport(CustomerPortal):
         :param template: the aeroo report template.
         :param download: whether the report is dowloaded or only shown to the screen.
         """
-        pdf = template.sudo().render_aeroo(doc_ids=[record.id], force_output_format='pdf')[0]
+        pdf = template.sudo().render_aeroo(doc_ids=[record.id], data=data, force_output_format='pdf')[0]
 
         headers = [
             ('Content-Type', 'application/pdf'),

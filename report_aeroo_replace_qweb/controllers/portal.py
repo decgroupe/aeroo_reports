@@ -3,6 +3,7 @@
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.http import request
+from odoo.tools import safe_eval
 
 
 class PortalAccountWithAerooInvoiceReport(CustomerPortal):
@@ -15,6 +16,15 @@ class PortalAccountWithAerooInvoiceReport(CustomerPortal):
         """
         report = request.env.ref(report_ref)
         if report_type == "pdf" and report.aeroo_report_id:
-            return self._show_aeroo_report(model, report.aeroo_report_id, download=download)
+            if report.aeroo_report_custom_data:
+                # Init data like report_aeroo/models/ir_actions_report.py
+                data = {
+                    'action_context': {},
+                    'data': {},
+                }
+                data.update(safe_eval(report.aeroo_report_custom_data))
+            else:
+                data = None
+            return self._show_aeroo_report(model, report.aeroo_report_id, data, download=download)
         else:
             return super()._show_report(model, report_type, report_ref, download=download)

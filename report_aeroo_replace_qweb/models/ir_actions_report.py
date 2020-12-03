@@ -2,6 +2,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import api, fields, models
+from odoo.tools import safe_eval
 
 
 class IrActionsReport(models.Model):
@@ -20,7 +21,8 @@ class IrActionsReport(models.Model):
 
     aeroo_report_id = fields.Many2one(
         'ir.actions.report',
-        help="This field allows to select an Aeroo report that replaces this report."
+        help=
+        "This field allows to select an Aeroo report that replaces this report."
     )
 
     qweb_report_ids = fields.One2many(
@@ -30,10 +32,27 @@ class IrActionsReport(models.Model):
         "by this Aeroo report. Only qweb-pdf reports are supported."
     )
 
+    aeroo_report_custom_data = fields.Text(
+        string="Aeroo Data",
+        help="Custom dict that will be added to report data to set or "
+        "override some values, you can start with: "
+        "{'action_context': {}, 'data': {}}"
+    )
+
     @api.multi
     def render_qweb_pdf(self, res_ids=None, data=None):
         if self.aeroo_report_id:
+            if self.aeroo_report_custom_data:
+                # Init data like report_aeroo/models/ir_actions_report.py
+                if not data:
+                    data = {
+                        'action_context': {},
+                        'data': {},
+                    }
+                data.update(safe_eval(self.aeroo_report_custom_data))
+
             return self.aeroo_report_id.render_aeroo(
-                doc_ids=res_ids, data=data, force_output_format='pdf')
+                doc_ids=res_ids, data=data, force_output_format='pdf'
+            )
 
         return super().render_qweb_pdf(res_ids, data)
