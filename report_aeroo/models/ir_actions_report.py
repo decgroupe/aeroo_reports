@@ -346,12 +346,16 @@ class IrActionsReport(models.Model):
 
         return wrapper
 
-    def get_aeroo_filename(self, record, output_format):
+    def get_aeroo_filename(self, record, output_format=False):
         if self.attachment:
             filename = self._eval_aeroo_attachment_filename(self.attachment, record)
+        else:
+            filename = self.name
+
+        if output_format:
             return ".".join((filename, output_format))
         else:
-            return ".".join((self.name, output_format))
+            return filename
 
     def _eval_aeroo_attachment_filename(self, filename, record):
         template = mako_template_env.from_string(tools.ustr(filename))
@@ -611,13 +615,16 @@ class AerooReportsWithAttachmentFilenamePerLang(models.Model):
         "aeroo.filename.line", "report_id", "Filenames by Language"
     )
 
-    def get_aeroo_filename(self, record, output_format):
+    def get_aeroo_filename(self, record, output_format=False):
         if not self.aeroo_filename_per_lang:
             return super().get_aeroo_filename(record, output_format)
 
         mako_filename = self._get_aeroo_filename_from_lang(record)
         rendered_filename = self._eval_aeroo_attachment_filename(mako_filename, record)
-        return ".".join((rendered_filename, output_format))
+        if output_format:
+            return ".".join((rendered_filename, output_format))
+        else:
+            return rendered_filename
 
     def _get_aeroo_filename_from_lang(self, record):
         lang = self._get_aeroo_lang(record)
