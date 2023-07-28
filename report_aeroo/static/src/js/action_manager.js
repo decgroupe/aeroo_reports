@@ -15,7 +15,9 @@ async function aerooReportHandler(action, options, env) {
                 data: {
                     report_id: cloned_action.id,
                     record_ids: JSON.stringify(cloned_action.context.active_ids || []),
-                    // On retire la ligne "context: ..." qui faisait crasher le JS et le Python
+                    context: JSON.stringify(context),
+                    action_context: cloned_action.context ? JSON.stringify(cloned_action.context): "{}",
+                    action_data: cloned_action.data ? JSON.stringify(cloned_action.data): "{}",
                 },
             });
         } finally {

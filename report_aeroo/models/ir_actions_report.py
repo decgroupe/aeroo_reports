@@ -273,9 +273,18 @@ class IrActionsReport(models.Model):
     def _get_aeroo_libreoffice_timeout(self):
         return 60
 
+    def _init_data(self, data=None):
+        if data is None:
+            data = {}
+        if "action_context" not in data:
+            data["action_context"] = {}
+        if "action_data" not in data:
+            data["action_data"] = {}
+        return data
+
     def _render_aeroo(self, doc_ids, data=None, force_output_format=None):
         output_format = force_output_format or self.aeroo_out_format_id.code
-        data = data or {}
+        data = self._init_data(data)
 
         if len(doc_ids) > 1:
             return self._render_aeroo_multi(doc_ids, data, output_format)
@@ -578,7 +587,8 @@ class AerooReportsGeneratedFromListViews(models.Model):
             )
 
         output_format = force_output_format or self.aeroo_out_format_id.code
-        data = data or {}
+        data = self._init_data(data)
+
         records = self.env[self.model].browse(doc_ids)
 
         template = self._get_aeroo_template(records[0])
