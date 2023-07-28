@@ -7,6 +7,7 @@ from odoo import http, _
 from odoo.http import request, content_disposition
 from odoo.tools import html_escape
 from odoo.exceptions import ValidationError
+from odoo.tools.safe_eval import safe_eval, time
 
 try:
     from odoo.http import serialize_exception
@@ -43,7 +44,14 @@ class AerooReportController(http.Controller):
             report = request.env["ir.actions.report"].browse(report_id)
             content, out_format = report._render_aeroo(record_ids, {})
 
-            if len(record_ids) == 1:
+            if report.print_report_name:
+                obj = request.env[report.model].browse(record_ids)
+                file_name = safe_eval(report.print_report_name, {
+                    "object": obj,
+                    "time": time
+                })
+                file_name = "%s.%s" % (file_name, out_format)
+            elif len(record_ids) == 1:
                 record = request.env[report.model].browse(record_ids[0])
                 file_name = report.get_aeroo_filename(record, out_format)
             else:
