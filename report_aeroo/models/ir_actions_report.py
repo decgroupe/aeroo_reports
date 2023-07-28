@@ -390,7 +390,7 @@ class IrActionsReport(models.Model):
 
         return wrapper
 
-    def get_aeroo_filename(self, record, output_format):
+    def get_aeroo_filename(self, record, output_format=False):
         """Get the attachement filename for the generated report.
 
         :param record: the record for which to generate the report
@@ -398,9 +398,13 @@ class IrActionsReport(models.Model):
         """
         if self.attachment:
             filename = self._eval_aeroo_attachment_filename(self.attachment, record)
-            return ".".join((filename, output_format))
         else:
-            return ".".join((self.name, output_format))
+            filename = self.name
+
+        if output_format:
+            return '.'.join((filename, output_format))
+        else:
+            return filename
 
     def _eval_aeroo_attachment_filename(self, filename, record):
         """Evaluate the given attachment filename for the given record.
@@ -667,7 +671,7 @@ class AerooReportsWithAttachmentFilenamePerLang(models.Model):
         "aeroo.filename.line", "report_id", "Filenames by Language"
     )
 
-    def get_aeroo_filename(self, record, output_format):
+    def get_aeroo_filename(self, record, output_format=False):
         """Get the attachement filename for the generated report.
 
         :param record: the record for which to generate the freport
@@ -678,7 +682,10 @@ class AerooReportsWithAttachmentFilenamePerLang(models.Model):
 
         mako_filename = self._get_aeroo_filename_from_lang(record)
         rendered_filename = self._eval_aeroo_attachment_filename(mako_filename, record)
-        return ".".join((rendered_filename, output_format))
+        if output_format:
+            return ".".join((rendered_filename, output_format))
+        else:
+            return rendered_filename
 
     def _get_aeroo_filename_from_lang(self, record):
         """Get the attachment filename for the record based on the rendering language.
