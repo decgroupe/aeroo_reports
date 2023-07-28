@@ -26,7 +26,7 @@ class AerooReportController(http.Controller):
 
     @http.route('/web/report_aeroo', type='http', auth="user")
     @serialize_exception
-    def generate_aeroo_report(self, report_id, record_ids, token, debug=False):
+    def generate_aeroo_report(self, report_id, record_ids, context, action_context, action_data, token, debug=False):
         """Generate an aeroo report.
 
         Add the filename of the generated report to the response headers.
@@ -35,9 +35,15 @@ class AerooReportController(http.Controller):
         """
         report_id = int(report_id)
         record_ids = json.loads(record_ids)
+        context = json.loads(context)
+        data = {
+            "action_context": json.loads(action_context) if action_context else {},
+            "action_data": json.loads(action_data) if action_data else {},
+        }
 
         report = request.env['ir.actions.report'].browse(report_id)
-        content, out_format = report._render_aeroo(record_ids, {})
+        data = report._init_data(data)
+        content, out_format = report._render_aeroo(record_ids, data)
 
         if report.print_report_name:
             obj = request.env[report.model].browse(record_ids)

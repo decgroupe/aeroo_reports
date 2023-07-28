@@ -27,11 +27,22 @@ class ReportControllerWithAerooReplacement(ReportController):
             report = _get_report_from_qweb_download_url(url)
             aeroo_report = report.aeroo_report_id
 
+            # Soft support for OCA's `report_context` module
+            action_context = ""
+            if hasattr(report, "context"):
+                action_context = report.context
+            if hasattr(aeroo_report, "context"):
+                if not action_context or action_context == "{}":
+                    action_context = aeroo_report.context
+
             if aeroo_report:
                 record_ids = _get_doc_ids_from_qweb_download_url(url)
                 return http.local_redirect('/web/report_aeroo', {
                     'report_id': aeroo_report.id,
                     'record_ids': json.dumps(record_ids),
+                    'context': "{}",
+                    'action_context': action_context,
+                    'action_data': "{}",
                     'token': token,
                 })
 

@@ -59,6 +59,8 @@ ActionManager.include({
                     report_id: action.id,
                     record_ids: JSON.stringify(action.context.active_ids),
                     context: JSON.stringify(context),
+                    action_context: action.context ? JSON.stringify(action.context): "{}",
+                    action_data: action.data ? JSON.stringify(action.data): "{}",
                 },
                 success: resolve,
                 error: (err) => {
