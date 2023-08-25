@@ -282,6 +282,9 @@ class IrActionsReport(models.Model):
             data["action_data"] = {}
         return data
 
+    def render_aeroo(self, doc_ids, data=None, force_output_format=None, title=None):
+        return self._render_aeroo(doc_ids, data, force_output_format)
+
     def _render_aeroo(self, doc_ids, data=None, force_output_format=None):
         output_format = force_output_format or self.aeroo_out_format_id.code
         data = self._init_data(data)
