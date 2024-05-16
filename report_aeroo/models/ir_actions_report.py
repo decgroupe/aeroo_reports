@@ -471,6 +471,17 @@ class IrActionsReport(models.Model):
             }
         )
 
+    def _get_cmd(self, output_format, filedir, temp_filename):
+        return  [
+            "libreoffice",
+            "--headless",
+            "--convert-to",
+            output_format,
+            "--outdir",
+            filedir,
+            temp_filename,
+        ]
+
     def _convert_aeroo_report(self, output, output_format):
         """Convert a generated aeroo report to the output format.
 
@@ -484,7 +495,12 @@ class IrActionsReport(models.Model):
         filedir, filename = os.path.split(temp_file.name)
 
         cmd = [
-            "libreoffice",
+            "docker",
+            "run",
+            "--rm",
+            "--volume",
+            "/opt/tmp:/opt/tmp",
+            "docker-registry.decgroupe.com/tools/libreoffice-docker:8",
             "--headless",
             "--convert-to",
             output_format,
@@ -725,7 +741,7 @@ def generate_temporary_file(format, data=None):
     :param string format: the extension of the file to create
     :param bytes data: the data to write in the file
     """
-    temp_file = NamedTemporaryFile(suffix=".%s" % format, delete=False)
+    temp_file = NamedTemporaryFile(suffix=".%s" % format, delete=False, dir="/opt/tmp")
     temp_file.close()
     if data is not None:
         with open(temp_file.name, "wb") as f:
