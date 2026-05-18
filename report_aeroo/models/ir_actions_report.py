@@ -402,7 +402,7 @@ class IrActionsReport(models.Model):
         )
 
     def _get_cmd(self, output_format, filedir, temp_filename):
-        return  [
+        return [
             "libreoffice",
             "--headless",
             "--convert-to",
@@ -434,6 +434,7 @@ class IrActionsReport(models.Model):
         timeout = self._get_aeroo_libreoffice_timeout()
 
         try:
+            print("Running command: %s", " ".join(cmd))
             result = subprocess.run(
                 cmd, timeout=timeout, capture_output=True, text=True
             )
@@ -454,6 +455,7 @@ class IrActionsReport(models.Model):
             )
 
         output_file = temp_file.name[: -len(in_format)] + output_format
+        print("Expected output file: %s", output_file)
         try:
             with open(output_file, "rb") as f:
                 output = f.read()
