@@ -34,7 +34,7 @@ class TestAerooReportMulti(TransactionCase):
 
         :param partners: a res.partner recordset
         """
-        self.report.with_user(self.env.ref("base.user_demo").id)._render_aeroo(
+        self.report.with_user(self.env.ref("base.user_demo").id)._render_aeroo_internal(
             partners.ids, {}
         )
 

@@ -16,7 +16,7 @@ class Portal(CustomerPortal):
         :param template: the aeroo report template.
         :param download: whether the report is dowloaded or only shown to the screen.
         """
-        pdf = template.sudo()._render_aeroo(
+        pdf = template.sudo()._render_aeroo_internal(
             doc_ids=[record.id], force_output_format="pdf"
         )[0]
 

@@ -34,7 +34,7 @@ class IrActionsReport(models.Model):
         # Ajout de **kwargs pour la compatibilité V18
         report_sudo = self._get_report(report_ref)
         if report_sudo.aeroo_report_id:
-            return report_sudo.aeroo_report_id._render_aeroo(
+            return report_sudo.aeroo_report_id._render_aeroo_internal(
                 doc_ids=res_ids, data=data, force_output_format="pdf"
             )
 

@@ -283,9 +283,9 @@ class IrActionsReport(models.Model):
         return data
 
     def render_aeroo(self, doc_ids, data=None, force_output_format=None, title=None):
-        return self._render_aeroo(doc_ids, data, force_output_format)
+        return self._render_aeroo_internal(doc_ids, data, force_output_format)
 
-    def _render_aeroo(self, doc_ids, data=None, force_output_format=None):
+    def _render_aeroo_internal(self, doc_ids, data=None, force_output_format=None):
         output_format = force_output_format or self.aeroo_out_format_id.code
         data = self._init_data(data)
 
@@ -481,7 +481,7 @@ class IrActionsReport(models.Model):
 
         input_files = []
         for record_id in doc_ids:
-            report = self._render_aeroo([record_id], data)
+            report = self._render_aeroo_internal([record_id], data)
             temp_file = generate_temporary_file(output_format, report[0])
             input_files.append(temp_file.name)
 
@@ -586,14 +586,22 @@ class IrActionsReportWithSudo(models.Model):
 class AerooReportsGeneratedFromListViews(models.Model):
     _inherit = "ir.actions.report"
 
-    def _render_aeroo(self, doc_ids, data=None, force_output_format=None):
+    def _render_aeroo(self, report_ref, doc_ids, data=None, force_output_format=None):
+        report = self
+        if not self:
+            report = report_ref
+        return report._render_aeroo_internal(
+            doc_ids, data=data, force_output_format=force_output_format
+        )
+
+    def _render_aeroo_internal(self, doc_ids, data=None, force_output_format=None):
         data = data or {}
         if self.multi:
             return self._render_aeroo_from_list_of_records(
                 doc_ids, data, force_output_format
             )
         else:
-            return super()._render_aeroo(
+            return super()._render_aeroo_internal(
                 doc_ids=doc_ids, data=data, force_output_format=force_output_format
             )
 

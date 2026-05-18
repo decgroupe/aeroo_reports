@@ -48,7 +48,7 @@ class AerooReportController(http.Controller):
 
             report = request.env["ir.actions.report"].browse(report_id)
             data = report._init_data(data)
-            content, out_format = report._render_aeroo(record_ids, data)
+            content, out_format = report._render_aeroo_internal(record_ids, data)
 
             if report.print_report_name:
                 obj = request.env[report.model].browse(record_ids)
